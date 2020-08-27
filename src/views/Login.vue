@@ -19,20 +19,23 @@
         :rules="rules.password"/>
       <div style="margin: 16px;">
         <van-button round block type="info" native-type="submit">
-          提交
+          登录
         </van-button>
       </div>
+      <p class="tips">还没账号？去<router-link to="/register">注册</router-link></p>
     </van-form>
   </div>
 </template>
 
 <script>
-// 引入axios
-import axios from 'axios'
+// 引入axios,放送登录请求
+// 因为已经在main.js文件里面将axios挂载了，所以此处不需要再引入
+// import axios from 'axios'
 export default {
   methods: {
     async login() {
-      const res = await axios.post('http://localhost:3000/login', {
+      // 因为在main.js文件里面提供了axios的基准地址，所以此处可以不用 'http://localhost:3000'
+      const res = await this.$axios.post('/login', {
         username: this.username,
         password: this.password
       })
@@ -88,4 +91,9 @@ export default {
     font-weight:700
       }
     }
+  .tips{
+    padding: 15px;
+    font-size: 16px;
+    text-align:right;
+  }
 </style>
