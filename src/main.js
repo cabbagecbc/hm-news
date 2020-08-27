@@ -9,12 +9,15 @@ import './style/iconfont.css'
 // 导入vant
 import Vant from 'vant'
 import 'vant/lib/index.css'
+// 导入amfe-flexible
+import 'amfe-flexible'
+// 导入全局组件
+import HmHeader from './components/HmHeader.vue'
+Vue.component('hm-header', HmHeader)
+
 // 全局的把vant所有的组件都导入好了
 Vue.use(Vant)
-// 手动按需导入
-// import Button from 'vant/lib/button'
-// import 'vant/lib/button/style'
-// Vue.use(Button)
+
 // 关闭控制台的提示消息
 Vue.config.productionTip = false
 
