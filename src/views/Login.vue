@@ -32,6 +32,13 @@
 // 因为已经在main.js文件里面将axios挂载了，所以此处不需要再引入
 // import axios from 'axios'
 export default {
+  created() {
+    // const { username, password } = this.$route.query
+    // 传参时用到params就要改成params
+    const { username, password } = this.$route.params
+    this.username = username
+    this.password = password
+  },
   methods: {
     async login() {
       // 因为在main.js文件里面提供了axios的基准地址，所以此处可以不用 'http://localhost:3000'
@@ -45,8 +52,10 @@ export default {
         // 在组件中必须使用体会this.$toast
         this.$toast.success(message)
         // 保存token
-        // 跳转页面
-        this.$router.push('/user')
+        // 跳转到个人中心页面
+        this.$router.push({
+          path: '/user'
+        })
       } else {
         this.$toast.fail(message)
       }
@@ -71,7 +80,9 @@ export default {
 }
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
+// lang: 用于指定css语言 lang="less scss css"
+// scoped: 作用域 只要当前组件的样式带了scoped,那这个样式只会在当前组件生效
 .hm-header{
   height: 50px;
   border-bottom:1px solid #ccc;

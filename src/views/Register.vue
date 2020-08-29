@@ -51,7 +51,7 @@ export default {
         ],
         nickname: [
           { required: true, message: '输入昵称', trigger: 'onChange' },
-          { pattern: /^[\4e00-\u9fa5]{2,6}$/, message: '昵称必须时2-6位的中文', trigger: 'onChange' }
+          { pattern: /^[\u4e00-\u9fa5]{2,6}$/, message: '昵称必须时2-6位的中文', trigger: 'onChange' }
         ],
         password: [
           { required: true, message: '密码不能为空', trigger: 'onChange' },
@@ -72,7 +72,25 @@ export default {
         this.$toast.success(message)
         // 保存token
         // 跳转页面
-        this.$router.push('/login')
+        // this.$router.push('/login')
+        // this.$router.push(`/login?username=${this.user.name}&password=${this.user.password}`)
+        // 跳转得第二种写法，等价于上面的写法
+        this.$router.push({
+          // 第一种用path+query传参
+          // path: '/login',
+          // query: {
+          //   username: this.user.username,
+          //   password: this.user.password
+          // }
+          // query: this.user
+          // 第二种路由名字name+params传参
+          // 以上不能都写 只能写一种
+          name: 'login',
+          params: {
+            username: this.user.username,
+            password: this.user.password
+          }
+        })
       } else {
         this.$toast.fail(message)
       }
@@ -81,4 +99,10 @@ export default {
 }
 </script>
 
-<style></style>
+<style lang='less' scoped>
+.tips{
+    padding: 15px;
+    font-size: 16px;
+    text-align:right;
+  }
+</style>
