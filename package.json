@@ -12,6 +12,7 @@
     "axios": "^0.20.0",
     "babel-plugin-import": "^1.13.0",
     "core-js": "^3.6.5",
+    "moment": "^2.27.0",
     "vant": "^2.10.3",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0"

@@ -37,6 +37,9 @@
 // 因为main.js里面已经将axios挂载到原型链上，所以此处不需要再引入
 // import axios from 'axios'
 export default {
+  // beforRouteEnter(to, from, next) {
+  //   next()
+  // },
   data() {
     return {
       user: {

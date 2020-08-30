@@ -47,11 +47,14 @@ export default {
         password: this.password
       })
       // console.log(res.data)
-      const { statusCode, message } = res.data
+      const { statusCode, message, data } = res.data
+      console.log(res.data)
       if (statusCode === 200) {
         // 在组件中必须使用体会this.$toast
         this.$toast.success(message)
         // 保存token
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('userId', data.user.id)
         // 跳转到个人中心页面
         this.$router.push({
           path: '/user'

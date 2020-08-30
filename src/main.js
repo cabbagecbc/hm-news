@@ -14,15 +14,23 @@ import 'amfe-flexible'
 // 导入全局组件
 import HmHeader from './components/HmHeader.vue'
 import HmLogo from './components/HmLogo.vue'
+import HmNavItem from './components/HmNavItem.vue'
 import axios from 'axios'
+import moment from 'moment'
 
 // 把axios挂载到原型链上去
 Vue.prototype.$axios = axios
 // 给axios配置默认的baseURL，基准地址
 axios.defaults.baseURL = 'http://localhost:3000'
 
+// 定义全局过滤器
+Vue.filter('time', input => {
+  return moment(input).format('YYYY-MM-DD')
+})
+
 Vue.component('hm-header', HmHeader)
 Vue.component('hm-logo', HmLogo)
+Vue.component('hm-navitem', HmNavItem)
 // 全局的把vant所有的组件都导入好了
 Vue.use(Vant)
 
