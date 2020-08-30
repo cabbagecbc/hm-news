@@ -36,10 +36,10 @@
       <template>我的收藏</template>
       <template #content>文章/视频</template>
     </hm-navitem>
-    <hm-navitem  to="/edit">
-      <template>设置</template>
-      <template #content></template>
-    </hm-navitem>
+    <hm-navitem  to="/edit">设置</hm-navitem>
+    <div style="margin: 15px;">
+      <van-button type="info" block @click="logout">退出</van-button>
+    </div>
   </div>
 </template>
 
@@ -57,16 +57,36 @@ export default {
   },
   async created() {
     // token必须放到请求头中 请求头:Authorization
-    const token = localStorage.getItem('token')
     const userId = localStorage.getItem('userId')
-    const res = await this.$axios.get(`/user/${userId}`, {
-      headers: {
-        Authorization: token
-      }
-    })
+    const res = await this.$axios.get(`/user/${userId}`)
     const { statusCode, data } = res.data
     if (statusCode === 200) {
       this.user = data
+    }
+    // main.js文件里已经提示了用户信息验证失败
+    // else if (statusCode === 401) {
+    //   this.$toast('用户验证失败')
+    //   this.$router.push('/login')
+    //   localStorage.removeItem('token')
+    //   localStorage.removeItem('userId')
+    // }
+  },
+  methods: {
+    async logout() {
+      try {
+        // console.log('123')
+        await this.$dialog.confirm({
+          title: '温馨提示',
+          message: '确定要退出吗'
+        })
+      } catch {
+        return this.$toast('取消退出')
+      }
+      // console.log('确定')
+      localStorage.removeItem('token')
+      localStorage.removeItem('userId')
+      this.$router.push('/login')
+      this.$toast('退出成功')
     }
   }
 }
