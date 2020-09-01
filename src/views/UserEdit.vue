@@ -4,6 +4,7 @@
     <!-- 头像 -->
     <div class="avatar">
       <img :src="$axios.defaults.baseURL + user.head_img" alt="">
+      <van-uploader :after-read="afterRead" />
     </div>
     <!-- 导航 -->
     <hm-navitem @click="showNickname">
@@ -21,7 +22,7 @@
 
     <!-- 渲染dialog组件 -->
     <van-dialog v-model="isShowNickname" title="编辑昵称" show-cancel-button @confirm="updateNickname">
-      <van-field v-model="nickname" placeholder="请输入用户名" />
+      <van-field v-model="nickname" ref="nickname" placeholder="请输入用户名" />
     </van-dialog>
     <van-dialog v-model="isShowPassword" title="修改密码" show-cancel-button @confirm="updatePassword">
       <van-field v-model="password" placeholder="请输入密码" />
@@ -46,11 +47,30 @@
         </van-cell-group>
       </van-radio-group>
     </van-dialog>
+
+    <!-- 裁剪的模态框 -->
+    <div class="mask" v-show="isShowMask">
+      <van-button type="primary" class="crop" @click="crop">裁剪</van-button>
+      <van-button type="danger" class="cancel" @click="isShowMask = false">取消</van-button>
+      <VueCropper
+        ref="cabbage"
+        :img="img"
+        autoCrop
+        autoCropWidth="100"
+        autoCropHeight="100"
+        fixed
+      ></VueCropper>
+    </div>
   </div>
 </template>
 
 <script>
+import { VueCropper } from 'vue-cropper'
+
 export default {
+  components: {
+    VueCropper
+  },
   data() {
     return {
       user: '',
@@ -59,15 +79,18 @@ export default {
       isShowPassword: false,
       password: '',
       isShowGender: false,
-      gender: 1
+      gender: 1,
+      // 是否显示裁剪框
+      isShowMask: false,
+      img: ''
     }
   },
   created() {
     this.getUserInfo()
   },
   methods: {
+    // 封装发送请求，获取个人信息
     async getUserInfo() {
-      // 在送请求，获取个人信息
       const userId = localStorage.getItem('userId')
       const res = await this.$axios.get(`/user/${userId}`)
       console.log(res)
@@ -76,11 +99,17 @@ export default {
         this.user = data
       }
     },
-    showNickname() {
+    // 点击昵称弹出修改框
+    async showNickname() {
       // console.log('123')
       this.isShowNickname = true
       this.nickname = this.user.nickname
+      // 等待DOM的更新
+      await this.$nextTick()
+      // 弹出修改框获取焦点
+      this.$refs.nickname.focus()
     },
+    // 封装渲染用户数据
     async updateUser(data) {
       // console.log('123')
       const userId = localStorage.getItem('userId')
@@ -92,6 +121,7 @@ export default {
         this.$toast.success('修改成功')
       }
     },
+    // 渲染昵称修改后的数据：引入updateUser
     async updateNickname() {
       // console.log('123')
       // const userId = localStorage.getItem('userId')
@@ -108,10 +138,16 @@ export default {
         nickname: this.nickname
       })
     },
-    showPassword() {
+    // 点击密码弹出密码修改框并且设置自动获取焦点
+    async showPassword() {
       this.isShowPassword = true
       this.password = this.user.password
+      // 等待DOM的更新
+      await this.$nextTick()
+      // 弹出修改框后自动获取焦点
+      this.$refs.password.focus()
     },
+    // 渲染密码修改后的数据：引入updateUser
     async updatePassword() {
       // console.log('123')
       // const userId = localStorage.getItem('userId')
@@ -128,16 +164,63 @@ export default {
         password: this.password
       })
     },
+    // 点击性别弹出密码修改框
     showGender() {
       this.isShowGender = true
       this.gender = this.user.gender
     },
+    // 渲染性别修改后的数据：引入updateUser
     updateGender() {
       this.updateUser({
         gender: this.gender
       })
-    }
+    },
+    isImg(name) {
+      if (name.endsWith('.gif') || name.endsWith('.jpg') || name.endsWith('.png') || name.endsWith('.jpeg')) {
+        return true
+      } else {
+        return false
+      }
+    },
+    afterRead(file) {
+      // 校验图片的类型和大小，如果满足，才上传，如果不满足，给一个提示
+      console.log(file)
+      if (!this.isImg(file.file.name)) {
+        return this.$toast.fail('请上传正确格式的图片')
+      }
+      if (file.file.size >= 200 * 1024) {
+        return this.$toast.fail('请上传合适尺寸的图片')
+      }
 
+      // 显示裁剪框
+      this.isShowMask = true
+      // 设置裁剪的图片
+      this.img = file.content
+    },
+    crop() {
+      this.$refs.cabbage.getCropBlob(async blob => {
+        // console.log(data)
+        // 此时可以自行将文件上传至服务器  file.file
+        // console.log('文件读取完毕', file)
+        // 发送请求，上传文件
+        // 如果是通过ajax上传文件，请求体不能直接是一个普通对象，必须是一个formData对象
+        // 创建一个空的formData对象
+        const fd = new FormData()
+        // 给formData对象添加上传的文件
+        fd.append('file', blob)
+        const res = await this.$axios.post('/upload', fd)
+        const { statusCode, data } = res.data
+        if (statusCode === 200) {
+          console.log(data.url)
+          // 修改用户头像
+          this.updateUser({
+            head_img: data.url
+          })
+        }
+        // 隐藏裁剪框
+        this.isShowMask = false
+      })
+    }
   }
 }
 </script>
@@ -149,14 +232,24 @@ export default {
 .avatar {
   padding: 40px 0;
   text-align: center;
+  position: relative;
   img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
   }
+  .van-uploader {
+    position: absolute;
+    left: 50%;
+    top: 40px;
+    transform: translate(-50%);
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+  }
 }
 /*
-  深度作用选择器的三种写法
+  深度作用选择器有三种写法
   >>>  css的写法
   /deep/  less的写法
   ::v-deep  scss的写法
@@ -167,4 +260,24 @@ export default {
     border: 1px solid #ccc;
   }
 }
+
+.mask {
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  .crop,
+  .cancel {
+    position: fixed;
+    top: 0;
+    z-index: 1;
+  }
+
+  .cancel {
+    right: 0;
+  }
+}
+
 </style>
