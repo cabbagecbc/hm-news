@@ -41,7 +41,7 @@ export default {
       try {
         await this.$dialog.confirm({
           title: '温馨提示',
-          message: '你确定要取关该用户吗?'
+          message: '你确定要取消关注吗?'
         })
       } catch {
         return this.$toast('取消操作')
