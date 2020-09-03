@@ -44,33 +44,33 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .item {
-  border-bottom: 1px solid #ccc;
-  padding: 10px;
+.item {
+border-bottom: 1px solid #ccc;
+padding: 10px;
+display: flex;
+.info {
+  flex: 1;
+  font-size: 16px;
   display: flex;
-  .info {
-    flex: 1;
-    font-size: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    .user {
-      color: #666;
-      font-size: 14px;
-      span:first-child {
-        margin-right: 10px;
-      }
+  flex-direction: column;
+  justify-content: space-between;
+  .user {
+    color: #666;
+    font-size: 14px;
+    span:first-child {
+      margin-right: 10px;
     }
   }
-  .img {
-    img {
-      width: 120px;
-      height: 74px;
-      // 作用和background-size类似，，设置图片的大小
-      // cover的缺点：保证图片覆盖完整的大小， 缺点：会有一部分被截取掉
-      // contain: 保证图片被完整的显示，会有留白
-      object-fit: cover;
-    }
+}
+.img {
+  img {
+    width: 120px;
+    height: 74px;
+    // 作用和background-size类似，，设置图片的大小
+    // cover的缺点：保证图片覆盖完整的大小， 缺点：会有一部分被截取掉
+    // contain: 保证图片被完整的显示，会有留白
+    object-fit: cover;
   }
+}
 }
 </style>

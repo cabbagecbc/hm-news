@@ -7,9 +7,10 @@ import UserEdit from '../views/user/UserEdit.vue'
 import Demo from '../views/user/Demo.vue'
 import MyFollow from '../views/user/MyFollow.vue'
 import Mycomment from '../views/user/MyComment.vue'
-import MyStar from '../views/news/MyStar.vue'
+import MyStar from '../views/user/MyStar.vue'
 // 自己加的作品页面
 import MyZuopin from '../views/user/MyZuopin.vue'
+import Index from '../views/news/Index.vue'
 
 Vue.use(VueRouter)
 
@@ -23,7 +24,8 @@ const routes = [
   { path: '/myfollow', component: MyFollow, name: 'myfollow' },
   { path: '/mycomment', component: Mycomment, name: 'mycomment' },
   { path: '/mystar', component: MyStar, name: 'mystar' },
-  { path: '/myzuopin', component: MyZuopin, name: 'myzuopin' }
+  { path: '/myzuopin', component: MyZuopin, name: 'myzuopin' },
+  { path: '/', component: Index, name: 'index' }
 ]
 
 const router = new VueRouter({
