@@ -28,11 +28,11 @@
       <template>我的跟帖</template>
       <template #content>回复/回复</template>
     </hm-navitem>
-    <hm-navitem>
+    <hm-navitem to="/myzuopin">
       <template>我的作品</template>
       <template #content>文章/视频</template>
     </hm-navitem>
-    <hm-navitem>
+    <hm-navitem to="/mystar">
       <template>我的收藏</template>
       <template #content>文章/视频</template>
     </hm-navitem>
