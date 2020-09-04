@@ -23,7 +23,7 @@ axios.interceptors.request.use(function(config) {
 })
 // 添加响应拦截器
 axios.interceptors.response.use(function(response) {
-  console.log('拦截了响应', response)
+  // console.log('拦截了响应', response)
   const { statusCode, message } = response.data
   if (statusCode === 401 && message === '用户信息验证失败') {
     // 跳转登录页面

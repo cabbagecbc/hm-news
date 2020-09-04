@@ -11,6 +11,7 @@ import MyStar from '../views/user/MyStar.vue'
 // 自己加的作品页面
 import MyZuopin from '../views/user/MyZuopin.vue'
 import Index from '../views/news/Index.vue'
+import Manage from '../views/news/Manage.vue'
 
 Vue.use(VueRouter)
 
@@ -25,7 +26,8 @@ const routes = [
   { path: '/mycomment', component: Mycomment, name: 'mycomment' },
   { path: '/mystar', component: MyStar, name: 'mystar' },
   { path: '/myzuopin', component: MyZuopin, name: 'myzuopin' },
-  { path: '/', component: Index, name: 'index' }
+  { path: '/', component: Index, name: 'index' },
+  { path: '/manage', component: Manage, name: 'manage' }
 ]
 
 const router = new VueRouter({
