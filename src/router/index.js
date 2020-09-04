@@ -12,6 +12,7 @@ import MyStar from '../views/user/MyStar.vue'
 import MyZuopin from '../views/user/MyZuopin.vue'
 import Index from '../views/news/Index.vue'
 import Manage from '../views/news/Manage.vue'
+import PostDetail from '../views/news/PostDetail.vue'
 
 Vue.use(VueRouter)
 
@@ -27,7 +28,8 @@ const routes = [
   { path: '/mystar', component: MyStar, name: 'mystar' },
   { path: '/myzuopin', component: MyZuopin, name: 'myzuopin' },
   { path: '/', component: Index, name: 'index' },
-  { path: '/manage', component: Manage, name: 'manage' }
+  { path: '/manage', component: Manage, name: 'manage' },
+  { path: '/post-detail/:id', component: PostDetail, name: 'post-detail' }
 ]
 
 const router = new VueRouter({
@@ -59,7 +61,7 @@ router.beforeEach(function(to, from, next) {
   // }
   const token = localStorage.getItem('token')
   // 需要拦截的所有页面
-  const authUrls = ['/user', '/user-edit', '/myfollow', '/mystar']
+  const authUrls = ['/user', '/user-edit', '/myfollow', '/mystar', '/myzuopin']
   if (!authUrls.includes(to.path) || token) {
     next()
   } else {
