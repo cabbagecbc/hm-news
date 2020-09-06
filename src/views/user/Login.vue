@@ -48,7 +48,7 @@ export default {
       })
       // console.log(res.data)
       const { statusCode, message, data } = res.data
-      console.log(res.data)
+      // console.log(res.data)
       if (statusCode === 200) {
         // 在组件中必须使用体会this.$toast
         this.$toast.success(message)
@@ -56,11 +56,16 @@ export default {
         localStorage.setItem('token', data.token)
         localStorage.setItem('userId', data.user.id)
         // 跳转到个人中心页面
-        this.$router.push({
-          path: '/user'
-        })
+        // this.$router.push('/user')
+        // this.$router.back()
+        // 因为某些功能需要登录后直接跳转回该页面 所以登录页面得跳转需要改动
+        if (this.$route.query.back) {
+          this.$router.back()
+        } else {
+          this.$router.push('/user')
+        }
       } else {
-        this.$toast.fail(message)
+        this.$toast.fail('登陆失败')
       }
     }
   },

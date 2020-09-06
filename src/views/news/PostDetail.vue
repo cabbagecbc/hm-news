@@ -7,29 +7,46 @@
       <div class="center">
         <span class="iconfont iconnew" @click="$router.back()"></span>
       </div>
+      <!-- 右边关注 -->
       <div class="right">
-        <div class="followed" v-if="false">已关注</div>
-        <div class="follow" v-else>关注</div>
+        <div class="followed" v-if="post.has_follow" @click="unfollow">已关注</div>
+        <div class="follow" v-else @click="follow">关注</div>
       </div>
     </div>
+    <!-- 文章详情 -->
     <div class="content">
       <div class="title">{{post.title}}</div>
       <div class="name">
         <span>{{post.user.nickname}}</span>
         <span>{{post.create_date | time}}</span>
       </div>
-      <div class="info" v-if="post.type===1" v-html="poat.content"></div>
+      <div class="info" v-if="post.type===1" v-html="post.content"></div>
       <video v-else :src="getUrl(post.content)" controls autoplay muted></video>
+      <!-- 点赞和分享 -->
       <div class="buttons">
-        <div class="good">
+        <div class="good" :class="{active: post.has_like}" @click="like">
           <span class="iconfont icondianzan"></span>
-          <span>112</span>
+          <span>{{post.like_length || 0}}</span>
         </div>
-        <div class="weixin">
+        <div class="share">
           <span class="iconfont iconweixin"></span>
           <span>微信</span>
         </div>
       </div>
+    </div>
+    <!-- 评论区域 -->
+    <div class="comment-list">
+      <h3>精彩回帖</h3>
+      <hm-comment :comment="comment" v-for="comment in commentList" :key="comment.id"></hm-comment>
+    </div>
+    <!-- 底部区域 -->
+    <div class="footer">
+      <div class="search">
+        <input type="text" placeholder="回复">
+      </div>
+      <span class="iconfont iconpinglun-"><i>20</i></span>
+      <span class="iconfont iconshoucang" :class="{now: post.has_star}" @click="star"></span>
+      <span class="iconfont iconfenxiang"></span>
     </div>
   </div>
 </template>
@@ -40,13 +57,34 @@ export default {
     return {
       post: {
         user: {}
-      }
+      },
+      commentList: []
     }
   },
   created() {
     this.getInfo()
+    this.getCommentList()
   },
   methods: {
+    // 判断用户是否登录,登录则跳回该页面
+    noLogin() {
+      // 判断是否登录
+      const token = localStorage.getItem('token')
+      if (!token) {
+        // 若是没有登陆了就要跳转到登录再跳转回来
+        this.$router.push({
+          path: '/login',
+          query: {
+            back: true
+          }
+        })
+        return true
+      } else {
+        // 若是登录
+        return false
+      }
+    },
+    // 获取文章详情
     async getInfo() {
       // 此处需要每篇文章的id
       const { id } = this.$route.params
@@ -58,6 +96,7 @@ export default {
         console.log(this.post)
       }
     },
+    // 获取视频详情地址
     getUrl(url) {
       // 获取标签中的内容
       const div = document.createElement('div')
@@ -65,6 +104,68 @@ export default {
       return div.innerText
       // innerText抽取标签里的内容
       // innerHTML包含标签
+    },
+    // 点击关注判断用户是否登录
+    async follow() {
+      // 判断是否登录，登录则直接关注，没登录则需要跳转到登录页面后用户登录再跳转回文章详情页面
+      const token = localStorage.getItem('token')
+      if (!token) {
+        // 没有token意味着没有登录
+        this.$router.push({
+          parh: '/login',
+          query: {
+            back: true
+          }
+        })
+        return
+      }
+      // 有token则直接关注，发送ajax请求
+      const res = await this.$axios.get(`/user_follows/${this.post.user.id}`)
+      console.log(res.data)
+      if (res.data.statusCode === 200) {
+        this.$toast.success('已关注')
+        this.getInfo()
+      }
+    },
+    // 取消关注
+    async unfollow() {
+      const res = await this.$axios.get(`/user_unfollow/${this.post.user.id}`)
+      const { statusCode } = res.data
+      if (statusCode === 200) {
+        this.$toast.success('取消关注成功')
+        this.getInfo()
+      }
+    },
+    // 判断是否登录，进行点赞
+    async like() {
+      if (this.noLogin()) return
+      const res = await this.$axios.get(`/post_like/${this.post.id}`)
+      const { statusCode, message } = res.data
+      if (statusCode === 200) {
+        this.$toast.success(message)
+        this.getInfo()
+      }
+    },
+    // 收藏
+    async star() {
+      if (this.noLogin()) return
+      const res = await this.$axios.get(`/post_star/${this.post.id}`)
+      const { statusCode, message } = res.data
+      if (statusCode === 200) {
+        this.$toast.success(message)
+        this.getInfo()
+      }
+    },
+    // 获取文章评论列表
+    async getCommentList() {
+      const id = this.$route.params.id
+      const res = await this.$axios.get(`/post_comment/${id}`)
+      console.log(res.data)
+      const { statusCode, data } = res.data
+      if (statusCode === 200) {
+        this.commentList = data
+        console.log(this.commentList)
+      }
     }
   }
 }
@@ -109,6 +210,7 @@ export default {
 }
 .content {
   padding: 10px;
+  border-bottom: 3px solid #ccc;
   .title {
     font-weight: 700;
     font-size: 18px;
@@ -151,7 +253,72 @@ export default {
         color: green;
       }
     }
+    .active{
+      color: red;
+      .iconfont{
+        color: red;
+      }
+    }
   }
-
+}
+// 评论回复区域
+.comment-list{
+  h3{
+    text-align: center;
+    padding: 10px 0;
+  }
+  p{
+    text-align: center;
+    color: #ccc;
+    margin-top: 10px;
+    font-size: 18px;
+  }
+}
+// 底部区域
+.footer{
+  background-color: #fff;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  border-top: 1px solid #ccc;
+  position: fixed;
+  bottom: 0;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+  .iconfont {
+    font-size: 24px;
+  }
+  .now {
+    color: red;
+  }
+  .iconpinglun- {
+    position: relative;
+    i {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background-color: red;
+      font-size: 10px;
+      color: #fff;
+      padding: 0 3px;
+      right: -5px;
+      border-radius: 5px;
+      font-style: normal;
+    }
+  }
+  .search {
+    width: 180px;
+    padding-right: 10px;
+    input {
+      height: 30px;
+      background-color: #ddd;
+      border-radius: 15px;
+      width: 100%;
+      border: none;
+      font-size: 14px;
+      padding-left: 20px;
+    }
+  }
 }
 </style>

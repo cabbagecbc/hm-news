@@ -183,10 +183,10 @@ export default {
   }
 }
 /deep/ .van-tabs__wrap {
-  width: 89%;
+  width: 100%;
 }
 .more {
-  width: 12%;
+  width: 10%;
   height: 44px;
   position: absolute;
   right: 0;
