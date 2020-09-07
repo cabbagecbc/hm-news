@@ -37,12 +37,21 @@
     <!-- 评论区域 -->
     <div class="comment-list">
       <h3>精彩回帖</h3>
-      <hm-comment :comment="comment" v-for="comment in commentList" :key="comment.id"></hm-comment>
+      <hm-comment
+      :comment="comment"
+      v-for="comment in commentList"
+      :key="comment.id"
+      @reply="onReply"
+      ></hm-comment>
     </div>
     <!-- 底部区域 -->
-    <div class="footer">
+    <div class="footer-textarea" v-if="isShowTextarea">
+      <textarea ref="textarea" :placeholder="'回复：' + nickname" v-model="content"></textarea>
+      <van-button class="send" type="danger" @click="publish">发送</van-button>
+    </div>
+    <div class="footer-input" v-else>
       <div class="search">
-        <input type="text" placeholder="回复">
+        <input type="text" placeholder="回复" @focus="onFocus">
       </div>
       <span class="iconfont iconpinglun-"><i>20</i></span>
       <span class="iconfont iconshoucang" :class="{now: post.has_star}" @click="star"></span>
@@ -58,7 +67,11 @@ export default {
       post: {
         user: {}
       },
-      commentList: []
+      commentList: [],
+      isShowTextarea: false,
+      content: '',
+      nickname: '',
+      replyId: ''
     }
   },
   created() {
@@ -166,6 +179,42 @@ export default {
         this.commentList = data
         console.log(this.commentList)
       }
+    },
+    // 显示文本域（评论回复框）
+    async onFocus() {
+      this.isShowTextarea = true
+      // 让textarea自动获取焦点
+      await this.$nextTick()
+      // console.log(this.$refs.textarea)
+      this.$refs.textarea.focus()
+    },
+    // 发表评论
+    async publish() {
+      const res = await this.$axios.post(`/post_comment/${this.post.id}`, {
+        content: this.content,
+        parent_id: this.replyId
+      })
+      // console.log(res)
+      const { statusCode, message } = res.data
+      if (statusCode === 200) {
+        this.$toast.success(message)
+        this.getCommentList()
+        this.content = ''
+        this.replyId = ''
+        this.nickname = ''
+        this.isShowTextarea = false
+      }
+    },
+    // 将id和nickname传给父组件
+    async onReply(id, nickname) {
+      console.log('父组件', id, nickname)
+      this.isShowTextarea = true
+      // 自动获取焦点
+      await this.$nextTick()
+      this.$refs.textarea.focus()
+      // 回显nickname
+      this.nickname = '@' + nickname
+      this.replyId = id
     }
   }
 }
@@ -275,7 +324,7 @@ export default {
   }
 }
 // 底部区域
-.footer{
+.footer-input{
   background-color: #fff;
   width: 100%;
   height: 50px;
@@ -319,6 +368,31 @@ export default {
       font-size: 14px;
       padding-left: 20px;
     }
+  }
+}
+.footer-textarea {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  position: fixed;
+  z-index: 999;
+  bottom: 0;
+  padding: 10px;
+  align-items: flex-end;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+  justify-content: space-around;
+  textarea {
+    width: 260px;
+    height: 80px;
+    background-color: #ccc;
+    border-radius: 5px;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+  }
+  .send{
+    border-radius: 20%;
   }
 }
 </style>

@@ -2,15 +2,15 @@
   <div class="hm-comment">
     <div class="title">
       <div class="left">
-        <img src="" alt="">
+        <img :src="$base + comment.user.head_img" alt="">
       </div>
       <div class="center">
         <p>{{comment.user.nickname}}</p>
         <p>{{comment.create_date | now}}</p>
       </div>
-      <div class="right">回复</div>
+      <div class="right" @click="reply">回复</div>
     </div>
-    <hm-floor class="first" :comment="comment.parent" v-if="comment.parent"></hm-floor>
+    <hm-floor @reply="onReply" class="first" :count="count" :comment="comment.parent" v-if="comment.parent"></hm-floor>
     <div class="content">{{comment.content}}</div>
   </div>
 </template>
@@ -19,6 +19,29 @@
 export default {
   props: {
     comment: Object
+  },
+  data() {
+    return {
+      count: this.getCount(0, this.comment)
+    }
+  },
+  methods: {
+    getCount(num, data) {
+      if (data.parent) {
+        return this.getCount(num + 1, data.parent)
+      } else {
+        return num
+      }
+    },
+    reply() {
+      // 把id和nickname传给父组件
+      // console.log(this.comment.id, this.comment.user.nickname)
+      this.$emit('reply', this.comment.id, this.comment.user.nickname)
+    },
+    // 楼层回复
+    onReply(id, nickname) {
+      this.$emit('reply', id, nickname)
+    }
   }
 }
 </script>
