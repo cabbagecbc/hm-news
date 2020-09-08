@@ -42,6 +42,8 @@
 
 <script>
 export default {
+  // 组件的名字，递归的时候可以通过name渲染自己，缓存的时候通过name可以缓存自己
+  name: 'index',
   data() {
     return {
       active: 0,
