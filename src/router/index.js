@@ -13,6 +13,7 @@ import MyZuopin from '../views/user/MyZuopin.vue'
 import Index from '../views/news/Index.vue'
 import Manage from '../views/news/Manage.vue'
 import PostDetail from '../views/news/PostDetail.vue'
+import Search from '../views/news/Search.vue'
 
 Vue.use(VueRouter)
 
@@ -29,7 +30,8 @@ const routes = [
   { path: '/myzuopin', component: MyZuopin, name: 'myzuopin' },
   { path: '/', component: Index, name: 'index' },
   { path: '/manage', component: Manage, name: 'manage' },
-  { path: '/post-detail/:id', component: PostDetail, name: 'post-detail' }
+  { path: '/post-detail/:id', component: PostDetail, name: 'post-detail' },
+  { path: '/search', component: Search, name: 'search' }
 ]
 
 const router = new VueRouter({

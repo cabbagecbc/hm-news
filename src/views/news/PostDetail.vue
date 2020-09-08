@@ -46,7 +46,7 @@
     </div>
     <!-- 底部区域 -->
     <div class="footer-textarea" v-if="isShowTextarea">
-      <textarea ref="textarea" :placeholder="'回复：' + nickname" v-model="content"></textarea>
+      <textarea ref="textarea" @blur="onBlur" :placeholder="'回复：' + nickname" v-model="content"></textarea>
       <van-button class="send" type="danger" @click="publish">发送</van-button>
     </div>
     <div class="footer-input" v-else>
@@ -215,6 +215,15 @@ export default {
       // 回显nickname
       this.nickname = '@' + nickname
       this.replyId = id
+    },
+    // 点击空白区域隐藏评论框
+    async onBlur() {
+      // 判断评论框里是否有内容，没有内容才可以点击空白区域隐藏
+      if (!this.content) {
+        this.isShowTextarea = false
+        this.replyId = ''
+        this.nickname = ''
+      }
     }
   }
 }
