@@ -38,6 +38,7 @@
     </hm-navitem>
     <hm-navitem  to="/user-edit">设置</hm-navitem>
     <div style="margin: 15px;">
+      <!-- <van-button class="goIndex" type="info" block @click="this.$router.push('/index')">进入首页</van-button> -->
       <van-button type="info" block @click="logout">退出</van-button>
     </div>
   </div>

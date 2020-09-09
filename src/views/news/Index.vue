@@ -60,6 +60,9 @@ export default {
     }
   },
   created() {
+    // this.getTabList()
+  },
+  activated() {
     this.getTabList()
   },
   methods: {

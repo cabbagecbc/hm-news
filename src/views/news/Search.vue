@@ -9,6 +9,7 @@
         placeholder="请输入搜索关键词"
         @keyup.enter="search"
         v-model="key"
+        @inout="recommend"
         >
       </div>
       <div class="right" @click="search">搜索</div>
@@ -56,6 +57,8 @@
 </template>
 
 <script>
+// import func from '../../../vue-temp/vue-editor-bridge'
+import { debounce } from '../../utils/tool.js'
 export default {
   data() {
     return {
@@ -110,10 +113,24 @@ export default {
     },
     // 搜索
     goSearch(item) {
-      console.log('123')
+      // console.log('123')
       this.key = item
       this.search()
-    }
+    },
+    recommend: debounce(async function() {
+      if (this.key === '') return
+      const res = await this.$axios.get('/post_search_recommend', {
+        params: {
+          keyword: this.key
+        }
+      })
+      // console.log(res)
+      const { statusCode, data } = res.data
+      if (statusCode === 200) {
+        this.recommendList = data
+        console.log(this.recommendList)
+      }
+    }, 1000)
   },
   // 监听
   watch: {
